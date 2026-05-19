@@ -1,1 +1,1097 @@
-ypiie3e
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Absentees</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e293b,#111827);
+    color:white;
+    min-height:100vh;
+}
+
+#loginScreen{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.card{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    padding:20px;
+    border-radius:24px;
+    margin-bottom:20px;
+}
+
+input,button,select{
+    padding:12px;
+    border:none;
+    border-radius:14px;
+    margin:5px;
+}
+
+input,select{
+    background:#0f172a;
+    color:white;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+header{
+    text-align:center;
+    padding:20px;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.tabs{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    padding:10px;
+}
+
+.tab-btn{
+    background:#1e293b;
+}
+
+.tab-btn.active{
+    background:#2563eb;
+}
+
+.tab{
+    display:none;
+    padding:20px;
+}
+
+.tab.active{
+    display:block;
+}
+
+.student{
+    background:#111827;
+    padding:15px;
+    border-radius:18px;
+    margin-top:12px;
+}
+
+.student-name{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.stats{
+    margin-top:8px;
+    opacity:0.85;
+}
+
+.report-line{
+    background:#111827;
+    padding:12px;
+    border-radius:14px;
+    margin-top:10px;
+}
+
+.date-controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+}
+
+.back-btn{
+    background:#1e293b;
+    margin:15px;
+}
+
+.current-date{
+    opacity:0.8;
+    margin-top:10px;
+    font-size:14px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginScreen">
+
+    <div class="card" style="max-width:400px;width:100%;text-align:center;">
+
+        <h1>📘 Absentees</h1>
+
+        <p style="margin-top:10px;opacity:0.8;">
+            Enter 4 digit code
+        </p>
+
+        <input
+            type="password"
+            id="accessCode"
+            maxlength="4"
+            placeholder="0000"
+            style="
+                width:100%;
+                text-align:center;
+                font-size:24px;
+                letter-spacing:8px;
+            "
+        >
+
+        <button
+            onclick="login()"
+            style="width:100%;"
+        >
+            Enter
+        </button>
+
+        <div
+            id="loginMessage"
+            style="margin-top:15px;color:#f87171;"
+        ></div>
+
+    </div>
+
+</div>
+
+<!-- ADMIN -->
+
+<div id="adminPanel" style="display:none;">
+
+    <button
+        class="back-btn"
+        onclick="goBackToLogin()"
+    >
+        ⬅ Back
+    </button>
+
+    <div class="card">
+
+        <h2>🔐 Secret Admin Panel</h2>
+
+        <input
+            type="text"
+            id="newUserName"
+            placeholder="Person Name"
+        >
+
+        <input
+            type="number"
+            id="newUserCode"
+            placeholder="4 Digit Code"
+        >
+
+        <button onclick="createUserCode()">
+            Create User
+        </button>
+
+        <div id="adminUsers"></div>
+
+    </div>
+
+</div>
+
+<!-- MAIN APP -->
+
+<div id="mainApp" style="display:none;">
+
+<button
+    class="back-btn"
+    onclick="goBackToLogin()"
+>
+    ⬅ Back
+</button>
+
+<header>
+
+    📘 Absentees
+
+    <div
+        class="current-date"
+        id="currentDateDisplay"
+    ></div>
+
+</header>
+
+<div class="tabs">
+
+    <button
+        class="tab-btn active"
+        onclick="openTab(event,'tracker')"
+    >
+        Tracker
+    </button>
+
+    <button
+        class="tab-btn"
+        onclick="openTab(event,'leaderboard')"
+    >
+        Leaderboard
+    </button>
+
+    <button
+        class="tab-btn"
+        onclick="openTab(event,'report')"
+    >
+        Report
+    </button>
+
+</div>
+
+<!-- TRACKER -->
+
+<div class="tab active" id="tracker">
+
+    <div class="card">
+
+        <h2>Add Student</h2>
+
+        <input
+            type="text"
+            id="studentInput"
+            placeholder="Student name"
+        >
+
+        <button onclick="addStudent()">
+            Add Student
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Select Date</h2>
+
+        <div class="date-controls">
+
+            <button onclick="changeDate(-1)">
+                ⬅ Previous
+            </button>
+
+            <input type="date" id="datePicker">
+
+            <button onclick="changeDate(1)">
+                Next ➡
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Students</h2>
+
+        <div id="studentList"></div>
+
+    </div>
+
+</div>
+
+<!-- LEADERBOARD -->
+
+<div class="tab" id="leaderboard">
+
+    <div class="card">
+
+        <h2>🏆 Top 5 Monthly Absentees</h2>
+
+        <div id="monthlyLeaderboard"></div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>👑 Top 5 Yearly Absentees</h2>
+
+        <div id="yearlyLeaderboard"></div>
+
+    </div>
+
+</div>
+
+<!-- REPORT -->
+
+<div class="tab" id="report">
+
+    <div class="card">
+
+        <h2>Generate Report</h2>
+
+        <button onclick="generateReport()">
+            Generate
+        </button>
+
+        <div id="reportOutput"></div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGIN */
+
+let currentUserCode = '';
+
+let userAccounts =
+    JSON.parse(
+        localStorage.getItem('userAccounts')
+    ) || {
+        '3492':'Teacher 1',
+        '3493':'Teacher 2'
+    };
+
+function getStorageKey(key){
+    return `${currentUserCode}_${key}`;
+}
+
+function login(){
+
+    const code =
+        document.getElementById('accessCode')
+        .value;
+
+    const message =
+        document.getElementById('loginMessage');
+
+    if(code === '0000'){
+
+        document.getElementById('loginScreen')
+            .style.display='none';
+
+        document.getElementById('adminPanel')
+            .style.display='block';
+
+        renderAdminUsers();
+
+        return;
+    }
+
+    if(!userAccounts[code]){
+
+        message.innerText =
+            'No code registered';
+
+        return;
+    }
+
+    currentUserCode = code;
+
+    document.getElementById('loginScreen')
+        .style.display='none';
+
+    document.getElementById('mainApp')
+        .style.display='block';
+
+    loadUserData();
+
+    updateCurrentDate();
+}
+
+function goBackToLogin(){
+
+    currentUserCode='';
+
+    document.getElementById('mainApp')
+        .style.display='none';
+
+    document.getElementById('adminPanel')
+        .style.display='none';
+
+    document.getElementById('loginScreen')
+        .style.display='flex';
+
+    document.getElementById('accessCode')
+        .value='';
+
+    document.getElementById('loginMessage')
+        .innerText='';
+}
+
+/* ADMIN */
+
+function createUserCode(){
+
+    const name =
+        document.getElementById('newUserName')
+        .value.trim();
+
+    const code =
+        document.getElementById('newUserCode')
+        .value.trim();
+
+    if(name === '' || code.length !== 4){
+        return;
+    }
+
+    userAccounts[code]=name;
+
+    localStorage.setItem(
+        'userAccounts',
+        JSON.stringify(userAccounts)
+    );
+
+    renderAdminUsers();
+
+    document.getElementById('newUserName')
+        .value='';
+
+    document.getElementById('newUserCode')
+        .value='';
+}
+
+function deleteUser(code){
+
+    const confirmDelete =
+        confirm(`Delete ${code}?`);
+
+    if(!confirmDelete) return;
+
+    localStorage.removeItem(`${code}_students`);
+    localStorage.removeItem(`${code}_attendance`);
+
+    delete userAccounts[code];
+
+    localStorage.setItem(
+        'userAccounts',
+        JSON.stringify(userAccounts)
+    );
+
+    renderAdminUsers();
+}
+
+function renderAdminUsers(){
+
+    const box =
+        document.getElementById('adminUsers');
+
+    box.innerHTML='';
+
+    Object.keys(userAccounts).forEach(code=>{
+
+        box.innerHTML += `
+
+            <div class="report-line">
+
+                ${userAccounts[code]}
+
+                <br>
+
+                Code: ${code}
+
+                <br><br>
+
+                <button
+                    onclick="deleteUser('${code}')"
+                    style="background:#dc2626;"
+                >
+                    Delete User
+                </button>
+
+            </div>
+
+        `;
+    });
+}
+
+/* DATA */
+
+let students = [];
+let attendance = {};
+
+const datePicker =
+    document.getElementById('datePicker');
+
+setTodayDate();
+
+function setTodayDate(){
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+
+    const month =
+        String(now.getMonth()+1)
+        .padStart(2,'0');
+
+    const day =
+        String(now.getDate())
+        .padStart(2,'0');
+
+    datePicker.value =
+        `${year}-${month}-${day}`;
+}
+
+function updateCurrentDate(){
+
+    const now = new Date();
+
+    const options = {
+        weekday:'long',
+        year:'numeric',
+        month:'long',
+        day:'numeric'
+    };
+
+    document.getElementById(
+        'currentDateDisplay'
+    ).innerText =
+        now.toLocaleDateString(
+            'en-US',
+            options
+        );
+}
+
+function loadUserData(){
+
+    students =
+        JSON.parse(
+            localStorage.getItem(
+                getStorageKey('students')
+            )
+        ) || [];
+
+    attendance =
+        JSON.parse(
+            localStorage.getItem(
+                getStorageKey('attendance')
+            )
+        ) || {};
+
+    renderStudents();
+
+    updateLeaderboard();
+}
+
+function saveData(){
+
+    localStorage.setItem(
+        getStorageKey('students'),
+        JSON.stringify(students)
+    );
+
+    localStorage.setItem(
+        getStorageKey('attendance'),
+        JSON.stringify(attendance)
+    );
+}
+
+/* TABS */
+
+function openTab(event,tabId){
+
+    document.querySelectorAll('.tab')
+    .forEach(tab=>{
+        tab.classList.remove('active');
+    });
+
+    document.querySelectorAll('.tab-btn')
+    .forEach(btn=>{
+        btn.classList.remove('active');
+    });
+
+    document.getElementById(tabId)
+        .classList.add('active');
+
+    event.target.classList.add('active');
+
+    if(tabId === 'leaderboard'){
+        updateLeaderboard();
+    }
+}
+
+/* STUDENTS */
+
+function addStudent(){
+
+    const input =
+        document.getElementById('studentInput');
+
+    const name =
+        input.value.trim();
+
+    if(name==='') return;
+
+    students.push(name);
+
+    input.value='';
+
+    saveData();
+
+    renderStudents();
+
+    updateLeaderboard();
+}
+
+function getDate(){
+    return datePicker.value;
+}
+
+function toggleAbsent(name){
+
+    const date = getDate();
+
+    if(!attendance[date]){
+        attendance[date]=[];
+    }
+
+    if(attendance[date].includes(name)){
+
+        attendance[date] =
+            attendance[date]
+            .filter(student=>student!==name);
+
+    }else{
+
+        attendance[date].push(name);
+    }
+
+    saveData();
+
+    renderStudents();
+
+    updateLeaderboard();
+}
+
+function deleteStudent(name){
+
+    const confirmDelete =
+        confirm(`Delete ${name}?`);
+
+    if(!confirmDelete) return;
+
+    students =
+        students.filter(student=>student!==name);
+
+    Object.keys(attendance).forEach(date=>{
+
+        attendance[date] =
+            attendance[date]
+            .filter(student=>student!==name);
+
+    });
+
+    saveData();
+
+    renderStudents();
+
+    updateLeaderboard();
+}
+
+/* COUNTS */
+
+function countMonthAbsents(name,month,year){
+
+    let count = 0;
+
+    Object.keys(attendance).forEach(date=>{
+
+        if(attendance[date].includes(name)){
+
+            const d = new Date(date);
+
+            if(
+                d.getMonth() == month &&
+                d.getFullYear() == year
+            ){
+                count++;
+            }
+
+        }
+
+    });
+
+    return count;
+}
+
+function countYearAbsents(name,year){
+
+    let count = 0;
+
+    Object.keys(attendance).forEach(date=>{
+
+        if(attendance[date].includes(name)){
+
+            const d = new Date(date);
+
+            if(
+                d.getFullYear() == year
+            ){
+                count++;
+            }
+
+        }
+
+    });
+
+    return count;
+}
+
+function updateMonthDisplay(name){
+
+    const month =
+        Number(
+            document.getElementById(
+                `month-${name}`
+            ).value
+        );
+
+    const year =
+        Number(
+            document.getElementById(
+                `year-${name}`
+            ).value
+        );
+
+    const count =
+        countMonthAbsents(
+            name,
+            month,
+            year
+        );
+
+    document.getElementById(
+        `stats-${name}`
+    ).innerHTML = `
+
+        Absences in selected month:
+        ${count}
+
+    `;
+}
+
+/* RENDER */
+
+function renderStudents(){
+
+    const list =
+        document.getElementById('studentList');
+
+    list.innerHTML='';
+
+    const currentYear =
+        new Date().getFullYear();
+
+    students.forEach(name=>{
+
+        const absentToday =
+            attendance[getDate()]
+            ?.includes(name);
+
+        const div =
+            document.createElement('div');
+
+        div.className='student';
+
+        div.innerHTML = `
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                flex-wrap:wrap;
+                gap:10px;
+            ">
+
+                <div>
+
+                    <div class="student-name">
+                        ${name}
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        gap:5px;
+                        flex-wrap:wrap;
+                        margin-top:10px;
+                    ">
+
+                        <select
+                            id="month-${name}"
+                            onchange="updateMonthDisplay('${name}')"
+                        >
+
+                            <option value="0">January</option>
+                            <option value="1">February</option>
+                            <option value="2">March</option>
+                            <option value="3">April</option>
+                            <option value="4" selected>May</option>
+                            <option value="5">June</option>
+                            <option value="6">July</option>
+                            <option value="7">August</option>
+                            <option value="8">September</option>
+                            <option value="9">October</option>
+                            <option value="10">November</option>
+                            <option value="11">December</option>
+
+                        </select>
+
+                        <select
+                            id="year-${name}"
+                            onchange="updateMonthDisplay('${name}')"
+                        >
+
+                            <option value="${currentYear-1}">
+                                ${currentYear-1}
+                            </option>
+
+                            <option
+                                value="${currentYear}"
+                                selected
+                            >
+                                ${currentYear}
+                            </option>
+
+                            <option value="${currentYear+1}">
+                                ${currentYear+1}
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div
+                        class="stats"
+                        id="stats-${name}"
+                    >
+
+                        Absences in selected month:
+                        ${
+                            countMonthAbsents(
+                                name,
+                                new Date().getMonth(),
+                                currentYear
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <button
+                        onclick="toggleAbsent('${name}')"
+                    >
+                        ${
+                            absentToday
+                            ? '✅ Marked'
+                            : 'Mark Absent'
+                        }
+                    </button>
+
+                    <button
+                        onclick="deleteStudent('${name}')"
+                        style="background:#dc2626;"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+        list.appendChild(div);
+
+    });
+
+}
+
+/* DATE */
+
+function changeDate(days){
+
+    const current =
+        new Date(datePicker.value);
+
+    current.setDate(
+        current.getDate()+days
+    );
+
+    const year = current.getFullYear();
+
+    const month =
+        String(current.getMonth()+1)
+        .padStart(2,'0');
+
+    const day =
+        String(current.getDate())
+        .padStart(2,'0');
+
+    datePicker.value =
+        `${year}-${month}-${day}`;
+
+    renderStudents();
+}
+
+/* LEADERBOARD */
+
+function updateLeaderboard(){
+
+    const monthlyBox =
+        document.getElementById('monthlyLeaderboard');
+
+    const yearlyBox =
+        document.getElementById('yearlyLeaderboard');
+
+    monthlyBox.innerHTML='';
+    yearlyBox.innerHTML='';
+
+    const monthly=[];
+    const yearly=[];
+
+    const now = new Date();
+
+    const currentMonth =
+        now.getMonth();
+
+    const currentYear =
+        now.getFullYear();
+
+    students.forEach(name=>{
+
+        monthly.push({
+            name:name,
+            count:countMonthAbsents(
+                name,
+                currentMonth,
+                currentYear
+            )
+        });
+
+        yearly.push({
+            name:name,
+            count:countYearAbsents(
+                name,
+                currentYear
+            )
+        });
+
+    });
+
+    monthly.sort((a,b)=>b.count-a.count);
+    yearly.sort((a,b)=>b.count-a.count);
+
+    monthly.slice(0,5).forEach((student,index)=>{
+
+        monthlyBox.innerHTML += `
+
+            <div class="report-line">
+
+                <strong>#${index+1}</strong>
+
+                ${student.name}
+
+                <br>
+
+                Monthly Absents:
+                ${student.count}
+
+            </div>
+
+        `;
+    });
+
+    yearly.slice(0,5).forEach((student,index)=>{
+
+        yearlyBox.innerHTML += `
+
+            <div class="report-line">
+
+                <strong>#${index+1}</strong>
+
+                ${student.name}
+
+                <br>
+
+                Yearly Absents:
+                ${student.count}
+
+            </div>
+
+        `;
+    });
+}
+
+/* REPORT */
+
+function generateReport(){
+
+    const output =
+        document.getElementById('reportOutput');
+
+    output.innerHTML='';
+
+    const currentYear =
+        new Date().getFullYear();
+
+    const currentMonth =
+        new Date().getMonth();
+
+    students.forEach(name=>{
+
+        output.innerHTML += `
+
+            <div class="report-line">
+
+                <strong>${name}</strong>
+
+                <br>
+
+                Current Month:
+                ${
+                    countMonthAbsents(
+                        name,
+                        currentMonth,
+                        currentYear
+                    )
+                }
+
+                <br>
+
+                Current Year:
+                ${
+                    countYearAbsents(
+                        name,
+                        currentYear
+                    )
+                }
+
+            </div>
+
+        `;
+    });
+}
+
+</script>
+</body>
+</html>
